@@ -1,0 +1,81 @@
+---
+title: "Machine Learning - Course Project"
+author: "Oliver Gonzalez"
+date: "November 18, 2017" 
+output: html_document
+---
+
+```{r setup, include=FALSE}
+knitr::opts_chunk$set(echo = TRUE)
+library(caret); library(rattle); library(rpart); library(rpart.plot)
+library(randomForest); library(repmis)
+```
+
+## Background 
+Using devices such as Jawbone Up, Nike FuelBand, and Fitbit it is now possible to collect a large amount of data about personal activity relatively inexpensively. These type of devices are part of the quantified self movement – a group of enthusiasts who take measurements about themselves regularly to improve their health, to find patterns in their behavior, or because they are tech geeks. One thing that people regularly do is quantify how much of a particular activity they do, but they rarely quantify how well they do it. In this project, your goal will be to use data from accelerometers on the belt, forearm, arm, and dumbell of 6 participants. They were asked to perform barbell lifts correctly and incorrectly in 5 different ways. More information is available from the website here: http://groupware.les.inf.puc-rio.br/har (see the section on the Weight Lifting Exercise Dataset). 
+
+##Data Processing and Data cleaning
+The data for this project come from this source: http://groupware.les.inf.puc-rio.br/har. If you use the document you create for this class for any purpose please cite them as they have been very generous in allowing their data to be used for this kind of assignment.
+
+The training data for this project are available here:
+https://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv
+The test data are available here:
+https://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv.  We must Download and clean de data from division errors and empty strings replacing them by NA values.
+
+##Cross Validation & Data Partitioning
+Now lets partition de data into a trainning (60%) and test (40%) sets.  Also lets remove any NA and DIV/0 values.
+```{r Data Processing}
+train_url <- "http://d396qusza40orc.cloudfront.net/predmachlearn/pml-training.csv"
+test_url <- "http://d396qusza40orc.cloudfront.net/predmachlearn/pml-testing.csv"
+training_set<- read.csv(url(train_url), na.strings=c("NA","#DIV/0!",""))
+testing_set <- read.csv(url(test_url), na.strings=c("NA","#DIV/0!",""))
+inTrain <- createDataPartition(y=training_set$classe, p=0.60, list=FALSE)
+myTraining <- training_set[inTrain, ]; myTesting <- training_set[-inTrain, ]
+dim(myTraining); dim(myTesting)
+
+removeNAcols   <- function(x) { x[ , colSums( is.na(x) ) < nrow(x) ] }
+myTraining <- removeNAcols(myTraining)
+myTesting  <- removeNAcols(myTesting)
+
+complete   <- function(x) {x[,sapply(x, function(y) !any(is.na(y)))] }
+incomplete <- function(x) {names( x[,sapply(x, function(y) any(is.na(y)))] ) }
+
+trtr.na.var    <- incomplete(myTraining)
+trts.na.var    <- incomplete(myTesting)
+myTraining <- complete(myTraining)
+myTesting  <- complete(myTesting)
+
+#Lets remove the columns that are not predictors
+myTraining_fset <- myTraining[,8:length(myTraining)]
+
+#lets clear the variables with near zero variance
+vNearZero <- nearZeroVar(myTraining_fset, saveMetrics = TRUE)
+#Checking the result to see that there are zero values left
+vNearZero
+```
+
+##Model Selection 
+The selected model for this task will be Random Forest
+```{r Model Selection}
+#The model chosen is the random forest method
+keep <- names(myTraining_fset)
+#fit model- RANDOM FOREST
+set.seed(1235)
+
+modFit <- randomForest(classe~., data = myTraining_fset)
+print(modFit)
+
+qplot(roll_belt, magnet_dumbbell_y, colour=classe, data=myTraining_fset)  
+
+predict1 <- predict(modFit, myTesting, type = "class")
+confusionMatrix(myTesting$classe, predict1)
+predict_trainingset <- predict(modFit, myTraining, type = "class")
+confusionMatrix(myTraining$classe, predict_trainingset)
+```
+##Conclusion
+As we can se from the results for the Training set, the random forest method is the best fit model and has been selected for the test data to submit the final results for this assignment.
+
+```{r Conclussion}
+predict_testset <- predict(modFit, testing_set, type = "class")
+print(predict_testset)
+```
