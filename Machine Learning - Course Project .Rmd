@@ -55,7 +55,7 @@ vNearZero
 ```
 
 ##Model Selection 
-The selected model for this task will be Random Forest
+The selected model for this task will be Random Forest because it generates an internal unbiased estimate of the generalization error as the forest building progresses, Random Forest works well with a mixture of numerical and categorical features
 ```{r Model Selection}
 #The model chosen is the random forest method
 keep <- names(myTraining_fset)
@@ -73,7 +73,7 @@ predict_trainingset <- predict(modFit, myTraining, type = "class")
 confusionMatrix(myTraining$classe, predict_trainingset)
 ```
 ##Conclusion
-As we can se from the results for the Training set, the random forest method is the best fit model and has been selected for the test data to submit the final results for this assignment.
+As we can se from the results for the Training set, the random forest method is the best fit model and has been selected for the test data to submit the final results for this assignment, as it shows an 100% accuracy.
 
 ```{r Conclussion}
 predict_testset <- predict(modFit, testing_set, type = "class")
