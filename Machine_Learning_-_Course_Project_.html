@@ -194,7 +194,7 @@ vNearZero</code></pre>
 ## roll_dumbbell         1.049383   87.44904891   FALSE FALSE
 ## pitch_dumbbell        2.129412   85.33457880   FALSE FALSE
 ## yaw_dumbbell          1.231884   86.72724185   FALSE FALSE
-## total_accel_dumbbell  1.100119    0.35665761   FALSE FALSE
+ ## total_accel_dumbbell  1.100119    0.35665761   FALSE FALSE
 ## gyros_dumbbell_x      1.013333    1.95312500   FALSE FALSE
 ## gyros_dumbbell_y      1.169863    2.24184783   FALSE FALSE
 ## gyros_dumbbell_z      1.048518    1.63892663   FALSE FALSE
@@ -221,7 +221,7 @@ vNearZero</code></pre>
 </div>
 <div id="model-selection" class="section level2">
 <h2>Model Selection</h2>
-<p>The selected model for this task will be Random Forest</p>
+<p>The selected model for this task will be Random Forest because it generates an internal unbiased estimate of the generalization error as the forest building progresses, Random Forest works well with a mixture of numerical and categorical features</p>
 <pre class="r"><code>#The model chosen is the random forest method
 keep &lt;- names(myTraining_fset)
 #fit model- RANDOM FOREST
@@ -315,7 +315,7 @@ confusionMatrix(myTraining$classe, predict_trainingset)</code></pre>
 </div>
 <div id="conclusion" class="section level2">
 <h2>Conclusion</h2>
-<p>As we can se from the results for the Training set, the random forest method is the best fit model and has been selected for the test data to submit the final results for this assignment.</p>
+<p>As we can se from the results for the Training set, the random forest method is the best fit model and has been selected for the test data to submit the final results for this assignment, as it shows an 100% accuracy.</p>
 <pre class="r"><code>predict_testset &lt;- predict(modFit, testing_set, type = &quot;class&quot;)
 print(predict_testset)</code></pre>
 <pre><code>##  1  2  3  4  5  6  7  8  9 10 11 12 13 14 15 16 17 18 19 20 
